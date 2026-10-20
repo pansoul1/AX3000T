@@ -1,0 +1,43 @@
+#!/bin/sh
+# Remove only hash-matched files from our previous external WOL addon.
+# devices.json, user data, and every original Xiaomi file are preserved.
+set -eu
+[ -f /usr/share/rd03-local/PANSOUL1 ] || { echo 'This requires pansoul edition 1.' >&2; exit 1; }
+if grep -q ' /usr/lib/lua/luci/controller ' /proc/mounts || grep -q ' /usr/lib/lua/luci/view/web ' /proc/mounts; then
+    echo 'An external web mount is active. Reboot into the new ROM before cleanup.' >&2
+    exit 1
+fi
+/usr/libexec/rd03-wol-api --selftest | grep -q '"code":0' || exit 1
+lua /usr/share/rd03-local/check-web.lua --wol
+lua /usr/share/rd03-local/check-web.lua --wol
+echo 'Before:'
+df -h /data
+while read -r expected relative; do
+    file="/data/rd03-wol/$relative"
+    [ -f "$file" ] && [ ! -L "$file" ] || continue
+    # Never follow a substituted addon directory to another filesystem path.
+    [ ! -L /data/rd03-wol ] || exit 1
+    case "$relative" in
+        app/*) [ ! -L /data/rd03-wol/app ] || exit 1 ;;
+        bin/*) [ ! -L /data/rd03-wol/bin ] || exit 1 ;;
+    esac
+    actual=$(openssl dgst -sha256 "$file" | awk '{print $NF}')
+    if [ "$actual" = "$expected" ]; then
+        rm -f "$file"
+    else
+        echo "Preserved modified addon file: $relative"
+    fi
+done <<'MANIFEST'
+4d0b9feed9c5888d7058c66df42e2675d9186deab002b3e0574479a87330ff00 app/VERSION
+3b955d4ea6b35567795cfe1aee2a0aaffd17fcbc7a9bbe34793498ccfc39fded app/check-web.lua
+5c6135fd05bd20cf39fe3167ff9d61f675da4e55d56fa6f597112e1db422b811 app/header.htm
+a2ac14debfd1e1890b4ba0e142efbe98f21524a42bb89fefe1f2162d634d16c8 app/rd03_wol.lua
+73c1c7f0d9c318b2420ed476b271c2a14bd6ffe02090258960d4646d1983b65c app/rd03wol.htm
+fb5fec491df7b4efb7c59309332043d4844faa666611b0259972386a69cdfca2 bin/rd03-wol-api
+076445fa8d504656c4823a41e2176794526530aead062d81431b2c7457a9b274 start.sh
+4d6f6b55b6d227c43517eecf5514b5d1680d720ec117c8d8e6ec15f14161ed54 uninstall.sh
+MANIFEST
+rmdir /data/rd03-wol/app /data/rd03-wol/bin 2>/dev/null || true
+sync
+echo 'After (device list kept):'
+df -h /data

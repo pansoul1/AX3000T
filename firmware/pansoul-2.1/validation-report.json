@@ -1,0 +1,58 @@
+{
+  "edition": "pansoul 2.1",
+  "base_sha256": "92587d8b56c3f4a03f9a0e4a1ebd779a18a2bfe03793bbaf72910a4593d0cb43",
+  "web_sha256": "d3a3709631bf41858ca96845e4da22e5f2f17c07faee41dc8a47b8f7ece0997f",
+  "web_bytes": 34735112,
+  "ubi_bytes": 34734080,
+  "system_slot_bytes": 35651584,
+  "slot_margin_bytes": 917504,
+  "ubi": {
+    "image_bytes": 34734080,
+    "peb_size": 131072,
+    "vid_offset": 2048,
+    "data_offset": 4096,
+    "leb_size": 126976,
+    "image_sequence": 1719461964,
+    "eof_markers": 5,
+    "pebs": 265,
+    "volumes": {
+      "kernel": {
+        "volume_id": 0,
+        "reserved_ebs": 23,
+        "type": 1,
+        "autoresize": false,
+        "payload_sha256": "3ce090d347cb5fc191aec037d659318c2ac56d2381770278530b58705f86acad",
+        "payload_ebs": 23
+      },
+      "rootfs": {
+        "volume_id": 1,
+        "reserved_ebs": 235,
+        "type": 1,
+        "autoresize": false,
+        "payload_sha256": "1d6c97df04e33ff8455440a93d79028cf98752eca5df1428c6d106deba886380",
+        "payload_ebs": 235
+      }
+    }
+  },
+  "kernel_identical": true,
+  "rootfs": {
+    "filesystem_bytes": 29765054,
+    "inode_count": 4339,
+    "mtime": 1756114009,
+    "block_size": 262144,
+    "compression_id": 4,
+    "version": "4.0",
+    "sha256": "8eb5db5cee900aa5dc40aa4744978d2dafb2957e2579280f2b0abd39c06ec448"
+  },
+  "changed_nodes": [
+    "/bin/mkxqimage",
+    "/usr/share/rd03-local/BUILD.txt"
+  ],
+  "all_other_files_metadata_identical": true,
+  "nodes": 4339,
+  "verifier_sha256": "f078bd7dfb4775441d3dab7d7b972a681798bcff1d36d139dcdfe9b2674ab47c",
+  "no_bootloader_components": true,
+  "private_subscription_included": false,
+  "native_verifier_checks_passed": 17,
+  "boundary": "Native verifier tested on RD03; derivative filesystem verified locally; 2.1 ROM not flashed"
+}

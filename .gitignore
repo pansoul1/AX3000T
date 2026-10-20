@@ -1,0 +1,17 @@
+.work/
+.cache/
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+*.key
+*.pem
+private/
+input/
+*.yaml
+*.yml
+!.github/workflows/*.yml

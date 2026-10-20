@@ -1,0 +1,7 @@
+starts/afstart.sh
+starts/bfstart.sh
+starts/check_core.sh
+starts/clash_check.sh
+starts/clash_modify.sh
+starts/shellcrash.procd
+starts/start_error.sh

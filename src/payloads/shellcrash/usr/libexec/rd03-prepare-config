@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+umask 077
+[ "$#" = 2 ] || exit 1
+source=$1
+target=$2
+[ -s "$source" ] && [ "$source" != "$target" ] && [ ! -L "$target" ] || exit 1
+awk -f /usr/share/rd03-memory/prepare-config.awk "$source" > "$target" || { rm -f "$target"; echo 'RD03: unsupported rule/provider layout' >&2; exit 1; }
+awk '
+  /^[ \t]*#/ {next}
+  {line=toupper($0)}
+  line ~ /^[ \t]*FALLBACK-FILTER:/ && line ~ /GEOIP:[ \t]*FALSE/ && line ~ /GEOSITE:[ \t]*\[[ \t]*\]/ {next}
+  line ~ /GEOSITE[ \t]*[:,(]/ || line ~ /GEOIP[ \t]*[:,(]/ {bad=1}
+  END {exit(bad?1:0)}
+' "$target" || { rm -f "$target"; echo 'RD03: full geodata reference remains; startup held' >&2; exit 1; }

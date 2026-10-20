@@ -1,0 +1,70 @@
+{
+  "official_rom": {
+    "model": "RD03",
+    "version": "1.0.98",
+    "url": "https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/rom/rd03/miwifi_rd03_firmware_48abd_1.0.98.bin",
+    "sha256": "042ba08949e547007710caa43830e574a7a7f5964119af4c457409b2fa8b4bce"
+  },
+  "shellcrash": {
+    "version": "1.9.4",
+    "url": "https://github.com/juewuy/ShellCrash/releases/download/1.9.4/ShellCrash.tar.gz",
+    "sha256": "4f946031a0483ed528e266143d459075489cce6c3f8f2f4681f39ca6d7448681",
+    "source": "https://github.com/juewuy/ShellCrash/tree/1.9.4",
+    "license_source": "https://raw.githubusercontent.com/juewuy/ShellCrash/1.9.4/LICENSE.txt"
+  },
+  "mihomo": {
+    "version": "v1.19.17",
+    "url": "https://github.com/MetaCubeX/mihomo/releases/download/v1.19.17/mihomo-linux-arm64-v1.19.17.gz",
+    "compressed_sha256": "915cacd0cd51206ab467a5bd426a758d02272bb3adb7ab1d8ea372e541570778",
+    "uncompressed_sha256": "97e4d67653e213f1e857e55d030633faae9228d8c46696c3303251c0412960ed",
+    "source": "https://github.com/MetaCubeX/mihomo/tree/v1.19.17",
+    "source_archive": "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.17.tar.gz",
+    "license_source": "https://raw.githubusercontent.com/MetaCubeX/mihomo/v1.19.17/LICENSE"
+  },
+  "rules": {
+    "upstream": "MetaCubeX/meta-rules-dat",
+    "commit": "1852a7d214920d77c753293c49eb26a996e52081",
+    "assets": {
+      "ip": {
+        "local_file": "cn-ip.mrs",
+        "bytes": 38566,
+        "sha256": "794f27a804c7c8272b2b9c6322aa04da34291611fd3b48bc4b761bf43b35da9a",
+        "git_blob_sha1": "206d9e830f49ddf38ee8c797e41d1c0f8a189a88",
+        "source": "https://github.com/MetaCubeX/meta-rules-dat/blob/1852a7d214920d77c753293c49eb26a996e52081/geo/geoip/cn.mrs",
+        "intended_behavior": "ipcidr"
+      },
+      "domain": {
+        "local_file": "cn-domain.mrs",
+        "bytes": 534665,
+        "sha256": "21209c8ff73de954207e10fd817089986b5dad5606836924f88cffdfde9a8a0a",
+        "git_blob_sha1": "536c85a75daaf93fcc0ddea032bdeb2ad3725a17",
+        "source": "https://github.com/MetaCubeX/meta-rules-dat/blob/1852a7d214920d77c753293c49eb26a996e52081/geo/geosite/cn.mrs",
+        "intended_behavior": "domain"
+      }
+    },
+    "boundary": "Pinned Git blob metadata verified; parsed and loaded by official same-version ARM64 Mihomo (IP 10009 / domain 110446 rules) in an isolated test. Included in pansoul 2; new ROM boot/traffic untested. Dataset equivalence to the previous full MMDB is unverified."
+  },
+  "sftp": "sftp/packages.json",
+  "first_flash_external_tool": {
+    "project": "openwrt-xiaomi/xmir-patcher",
+    "commit": "16a46e350e3de2cb3415ab2cb652df53783998dc",
+    "url": "https://codeload.github.com/openwrt-xiaomi/xmir-patcher/zip/16a46e350e3de2cb3415ab2cb652df53783998dc",
+    "archive_sha256": "b33edcf1b5a6406d12428d681e0e117a86826a56fae7ed03ac99c1fc556bdc56",
+    "adapter": "src/scripts/unlock-stock-ssh.py",
+    "entrypoint": "First-Flash.ps1",
+    "method": "connect5 smartcontroller only; restricted to initialized RD03 1.0.98",
+    "distribution": "Explicit first-flash command downloads verified upstream archive into ignored .work; not bundled in ROM or source repository.",
+    "hardware_test": "NOT PERFORMED for the newly added adapter"
+  },
+  "project_binaries": {
+    "ssh": {
+      "sha256": "40ff352c1262c06943b4e06e896ff2abc2fece9a81a37be86cc2f8c1d4004b7a",
+      "source": "src/sources/ssh/rd03-admin-auth.c",
+      "compiler_boundary": "Archived boot-tested binary. Source included; rebuilding with another compiler requires ABI and runtime verification."
+    },
+    "wol": {
+      "sha256": "fb5fec491df7b4efb7c59309332043d4844faa666611b0259972386a69cdfca2",
+      "source": "src/sources/wol"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "wol-only",
+  "branding": "RD03 WOL 版本",
+  "features": {
+    "ssh": false,
+    "sftp": false,
+    "wol": true,
+    "shellcrash": false,
+    "custom_web_upgrade": false
+  }
+}

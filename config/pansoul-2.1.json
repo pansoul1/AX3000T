@@ -1,0 +1,11 @@
+{
+  "name": "pansoul-2.1",
+  "branding": "pansoul 定制版本 2.1",
+  "features": {
+    "ssh": true,
+    "sftp": true,
+    "wol": true,
+    "shellcrash": true,
+    "custom_web_upgrade": true
+  }
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Local offline installation of the pinned upstream ShellCrash scripts.
+# Existing installations are used as-is. No proxy starts merely by booting ROM.
+set -u
+export CRASHDIR=/data/ShellCrash
+if [ ! -f "$CRASHDIR/menu.sh" ]; then
+    /usr/libexec/rd03-shellcrash-install || exit $?
+fi
+/usr/libexec/rd03-shellcrash-prepare --ensure || exit $?
+exec /bin/sh "$CRASHDIR/menu.sh" "$@"

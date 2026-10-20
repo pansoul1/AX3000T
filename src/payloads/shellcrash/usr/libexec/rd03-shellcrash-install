@@ -1,0 +1,44 @@
+#!/bin/sh
+# Runs only when the owner first invokes crash. No router/network restart.
+set -eu
+umask 077
+export CRASHDIR=/data/ShellCrash
+PAYLOAD=/usr/share/rd03-local/ShellCrash-1.9.4.tar.gz
+fail() { echo "ShellCrash: $*" >&2; exit 1; }
+[ "$(id -u)" = 0 ] || fail 'Run as root.'
+[ ! -L "$CRASHDIR" ] || fail 'The install directory is a symbolic link.'
+[ ! -e "$CRASHDIR" ] || fail '/data/ShellCrash already exists; it has not been overwritten.'
+[ "$(openssl dgst -sha256 "$PAYLOAD" | awk '{print $NF}')" = '4f946031a0483ed528e266143d459075489cce6c3f8f2f4681f39ca6d7448681' ] || fail 'Offline archive SHA256 mismatch.'
+avail=$(df -k /data | awk 'END {print $4}')
+[ "$avail" -ge 2048 ] || fail 'At least 2 MiB free in /data is required for the scripts.'
+mkdir -m 700 "$CRASHDIR"
+tar -xzf "$PAYLOAD" -C "$CRASHDIR"
+# This ROM already owns SSH authentication. Avoid upstream's duplicate SSH
+# patch and its automatic deletion of stock logs/configuration backups.
+sed -i '/^[[:space:]]*autoSSH #/s/^/# pansoul: /; /^[[:space:]]*auto_clean #/s/^/# pansoul: /' "$CRASHDIR/starts/snapshot_init.sh"
+mkdir -p "$CRASHDIR/configs" "$CRASHDIR/yamls" /tmp/ShellCrash
+cat > "$CRASHDIR/configs/ShellCrash.cfg" <<'EOF'
+# Initial defaults for RD03 pansoul edition. Further settings belong to ShellCrash.
+mini_clash=ON
+crashcore=meta
+cpucore=arm64
+my_alias=crash
+EOF
+cat > "$CRASHDIR/configs/command.env" <<'EOF'
+TMPDIR=/tmp/ShellCrash
+BINDIR=/tmp/ShellCrash
+COMMAND="$TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml"
+EOF
+# Upstream's init performs its normal Xiaomi persistence setup, without starting
+# the proxy. The first menu still provides the upstream configuration guide.
+touch "$CRASHDIR/.dis_startup"
+export my_alias=crash version=1.9.4
+export url=https://raw.githubusercontent.com/juewuy/ShellCrash/master
+if /bin/sh -c '. "$CRASHDIR/init.sh"'; then
+    [ -s "$CRASHDIR/configs/ShellCrash.cfg" ] && [ -s "$CRASHDIR/configs/command.env" ] && [ -x "$CRASHDIR/menu.sh" ] || fail 'Initialization did not produce the expected files.'
+    /usr/libexec/rd03-shellcrash-prepare --ensure || fail 'Memory integration preparation failed.'
+    echo 'ShellCrash 1.9.4 installed with the verified ROM core and compact rules.'
+    echo 'Upload YAML to /data/ShellCrash/yamls/config.yaml, then configure/start in crash.'
+else
+    fail 'Initialization failed. Files remain in /data/ShellCrash for diagnosis.'
+fi

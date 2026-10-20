@@ -1,0 +1,130 @@
+{
+  "kind": "offline acceptance",
+  "builds": [
+    {
+      "name": "pansoul-2.1",
+      "profile": {
+        "name": "pansoul-2.1",
+        "branding": "pansoul 定制版本 2.1",
+        "features": {
+          "ssh": true,
+          "sftp": true,
+          "wol": true,
+          "shellcrash": true,
+          "custom_web_upgrade": true
+        }
+      },
+      "sha256": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
+      "bytes": 34735112,
+      "system_ubi_bytes": 34734080,
+      "kernel_identical": true,
+      "changed_stock_files": [
+        "/bin/mkxqimage",
+        "/etc/init.d/dropbear",
+        "/etc/sysctl.conf",
+        "/usr/lib/lua/luci/view/web/inc/footer.htm",
+        "/usr/lib/lua/luci/view/web/inc/header.htm"
+      ],
+      "selected_payloads_verified": 41,
+      "disabled_components_absent": true,
+      "original_stock_nodes_removed": [],
+      "hardware_test": "NOT PERFORMED"
+    },
+    {
+      "name": "minimal",
+      "profile": {
+        "name": "minimal",
+        "branding": "RD03 自定义版本",
+        "features": {
+          "ssh": true,
+          "sftp": true,
+          "wol": false,
+          "shellcrash": false,
+          "custom_web_upgrade": true
+        }
+      },
+      "sha256": "1e86cedc943023f178ae632ac057f587df88b3708b9409db935be3c6efd36626",
+      "bytes": 24118280,
+      "system_ubi_bytes": 24117248,
+      "kernel_identical": true,
+      "changed_stock_files": [
+        "/bin/mkxqimage",
+        "/etc/init.d/dropbear",
+        "/usr/lib/lua/luci/view/web/inc/footer.htm"
+      ],
+      "selected_payloads_verified": 10,
+      "disabled_components_absent": true,
+      "original_stock_nodes_removed": [],
+      "hardware_test": "NOT PERFORMED"
+    },
+    {
+      "name": "wol-only",
+      "profile": {
+        "name": "wol-only",
+        "branding": "RD03 WOL 版本",
+        "features": {
+          "ssh": false,
+          "sftp": false,
+          "wol": true,
+          "shellcrash": false,
+          "custom_web_upgrade": false
+        }
+      },
+      "sha256": "0497b578f8978c6c20d1ce8c5ff39afca9d9c616237a77811a9ac9ab1c8c151b",
+      "bytes": 24773640,
+      "system_ubi_bytes": 24772608,
+      "kernel_identical": true,
+      "changed_stock_files": [
+        "/usr/lib/lua/luci/view/web/inc/footer.htm",
+        "/usr/lib/lua/luci/view/web/inc/header.htm"
+      ],
+      "selected_payloads_verified": 10,
+      "disabled_components_absent": true,
+      "original_stock_nodes_removed": [],
+      "hardware_test": "NOT PERFORMED"
+    }
+  ],
+  "date": "2026-10-20",
+  "host_platform": "Windows",
+  "python": "3.13",
+  "squashfs_tools_ng": "1.3.2",
+  "profile_matrix_valid_combinations": 20,
+  "python_regression_tests_passed": 16,
+  "wol_go_tests": "passed",
+  "all_shell_payloads_syntax": "passed",
+  "powershell_preparation_syntax": "passed",
+  "archive_21_unchanged": true,
+  "repeated_full_build_sha256": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
+  "repeat_build_byte_identical": true,
+  "router_actions": [],
+  "directory_reorganization": {
+    "date": "2026-10-20",
+    "major_root_folders": [
+      "config",
+      "src",
+      "firmware"
+    ],
+    "local_work_directory": ".work",
+    "full_build_sha256_after_move": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
+    "byte_identical_to_before_move": true,
+    "python_regression_tests_passed": 10,
+    "wol_runtime_rebuild": "passed",
+    "preparation_generation": "passed; no router connection",
+    "relative_markdown_links_checked": 12,
+    "router_actions": []
+  },
+  "first_flash_bootstrap": {
+    "date": "2026-10-20",
+    "entrypoint": "First-Flash.ps1",
+    "powershell_5_1_check_only": "passed on the archived 2.1 image and pinned official input",
+    "powershell_missing_and_invalid_rom_rejected": true,
+    "adapter_fake_gateway_tests_passed": 6,
+    "adapter_tests_on_upstream_python_3_8": "passed",
+    "upstream_windows_runtime_imports": "passed",
+    "upstream_commit": "16a46e350e3de2cb3415ab2cb652df53783998dc",
+    "upstream_archive_sha256": "b33edcf1b5a6406d12428d681e0e117a86826a56fae7ed03ac99c1fc556bdc56",
+    "relative_markdown_links_checked": 13,
+    "hardware_test": "NOT PERFORMED for first-flash SSH unlock or RAM mount",
+    "router_actions": []
+  }
+}

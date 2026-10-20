@@ -1,0 +1,18 @@
+* text=auto eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.lua text eol=lf
+*.awk text eol=lf
+*.go text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.ps1 text eol=crlf
+*.htm text eol=lf
+*.bin binary
+*.so binary
+*.gz binary
+*.mrs binary
+# Pinned runtime files must retain their exact bytes, including line endings.
+src/payloads/** -text -whitespace
+# Keep upstream license formatting verbatim.
+src/licenses/** -whitespace

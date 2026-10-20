@@ -1,0 +1,18 @@
+#!/bin/sh
+# Keep the vendor admin/root password stores unchanged. Prepare only durable host keys.
+set -eu
+awk '$2 == "/data" {found=1} END {exit !found}' /proc/mounts || exit 1
+umask 077
+mkdir -p /data/rd03-ssh /etc/dropbear
+chmod 700 /data/rd03-ssh /etc/dropbear
+if [ ! -s /data/rd03-ssh/dropbear_rsa_host_key ]; then
+    key_temporary="$(mktemp /data/rd03-ssh/.host-key.XXXXXX)"
+    rm -f "$key_temporary"
+    trap 'rm -f "$key_temporary"' EXIT HUP INT TERM
+    /usr/bin/dropbearkey -t rsa -s 2048 -f "$key_temporary" >/dev/null 2>&1
+    mv -f "$key_temporary" /data/rd03-ssh/dropbear_rsa_host_key
+    trap - EXIT HUP INT TERM
+    sync
+fi
+chmod 600 /data/rd03-ssh/dropbear_rsa_host_key
+ln -sf /data/rd03-ssh/dropbear_rsa_host_key /etc/dropbear/dropbear_rsa_host_key

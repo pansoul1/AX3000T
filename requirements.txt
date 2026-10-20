@@ -1,0 +1,3 @@
+dissect.squashfs==1.12
+dissect.cstruct==4.7
+dissect.util==3.24

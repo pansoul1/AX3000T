@@ -1,0 +1,127 @@
+#!/bin/sh
+# A parent outside the limit keeps failure cleanup alive if the core is killed.
+set -u
+umask 077
+kind=${1:-}
+shift || exit 1
+case "$kind" in validate|run) ;; *) echo 'RD03: invalid guard mode' >&2; exit 1;; esac
+CRASHDIR=/data/ShellCrash
+export CRASHDIR
+STATE=/data/rd03-memory
+RULES=/usr/share/rd03-memory/rules
+CG=
+job=
+stopping=0
+resource_stop=0
+available() { awk '/^MemAvailable:/ {print $2; found=1} END {if(!found) print 0}' /proc/meminfo; }
+stop_child() {
+    [ -n "$CG" ] && [ -r "$CG/tasks" ] || return 0
+    for signal in TERM KILL; do
+        for task in $(cat "$CG/tasks"); do
+            case "$task" in ''|*[!0-9]*) continue;; esac
+            [ "$task" != "$$" ] || continue
+            grep -Fq "/${CG##*/}" "/proc/$task/cgroup" 2>/dev/null || continue
+            kill -"$signal" "$task" 2>/dev/null || :
+        done
+        [ "$signal" != TERM ] || sleep 1
+    done
+}
+cleanup() {
+    stop_child
+    [ -z "$job" ] || { wait "$job" 2>/dev/null || :; job=; }
+    [ -z "$CG" ] || rmdir "$CG" 2>/dev/null || :
+}
+failed() {
+    touch "$CRASHDIR/.start_error" 2>/dev/null || :
+    if [ "$kind" = run ]; then "$CRASHDIR/starts/fw_stop.sh" >/dev/null 2>&1 || :; fi
+    logger -t rd03-memory "Core $kind held: $*" 2>/dev/null || :
+    echo "RD03: $*" >&2
+    exit 1
+}
+trap cleanup EXIT
+trap 'stopping=1; stop_child' HUP INT TERM
+mem=$(available)
+case "$mem" in ''|*[!0-9]*) failed 'Cannot read MemAvailable';; esac
+[ "$mem" -ge 57344 ] || failed "Need 56 MiB available before core $kind; current $mem KiB"
+root=
+for candidate in /sys/fs/cgroup/memory /sys/fs/cgroup; do
+    if [ -f "$candidate/memory.limit_in_bytes" ] && [ -w "$candidate/tasks" ]; then root=$candidate; break; fi
+done
+[ -n "$root" ] || failed 'Memory cgroup is unavailable'
+style=
+if [ "$kind" = validate ]; then
+    if timeout -s KILL -t 2 sh -c 'exit 0' >/dev/null 2>&1; then style=legacy;
+    elif timeout -s KILL 2 sh -c 'exit 0' >/dev/null 2>&1; then style=positional;
+    else failed 'No working timeout interface'; fi
+fi
+CG="$root/rd03-core-$kind-$$"
+mkdir "$CG" || failed 'Cannot create memory cgroup'
+for control in cpuset.mems cpuset.cpus; do
+    if [ -f "$CG/$control" ]; then
+        mask=$(cat "$root/$control")
+        [ -n "$mask" ] && echo "$mask" > "$CG/$control" || failed 'Cannot initialize cpuset'
+    fi
+done
+limit=$((mem - 24576))
+[ "$limit" -le 81920 ] || limit=81920
+echo $((limit * 1024)) > "$CG/memory.limit_in_bytes" || failed 'Cannot set memory limit'
+actual=$(cat "$CG/memory.limit_in_bytes")
+case "$actual" in ''|*[!0-9]*) failed 'Invalid effective memory limit';; esac
+[ "$actual" -gt 0 ] && [ "$actual" -le $((limit * 1024 + 4096)) ] || failed 'Memory limit was not applied'
+echo 0 > /proc/sys/vm/panic_on_oom || failed 'Cannot disable global OOM panic'
+child() {
+    exec sh -c '
+        echo "$$" > "$1/tasks" || exit 125
+        echo 800 > /proc/self/oom_score_adj 2>/dev/null || :
+        export GOMEMLIMIT=24MiB GOGC=20 SAFE_PATHS="$2"
+        unset SKIP_SAFE_PATH_CHECK
+        shift 2
+        exec "$@"
+    ' rd03-core "$CG" "$RULES" "$@"
+}
+case "$style" in
+  legacy) (timeout -s KILL -t 120 sh -c '
+        echo "$$" > "$1/tasks" || exit 125
+        echo 800 > /proc/self/oom_score_adj 2>/dev/null || :
+        export GOMEMLIMIT=24MiB GOGC=20 SAFE_PATHS="$2"
+        unset SKIP_SAFE_PATH_CHECK
+        shift 2; exec "$@"
+    ' rd03-core "$CG" "$RULES" "$@") &;;
+  positional) (timeout -s KILL 120 sh -c '
+        echo "$$" > "$1/tasks" || exit 125
+        echo 800 > /proc/self/oom_score_adj 2>/dev/null || :
+        export GOMEMLIMIT=24MiB GOGC=20 SAFE_PATHS="$2"
+        unset SKIP_SAFE_PATH_CHECK
+        shift 2; exec "$@"
+    ' rd03-core "$CG" "$RULES" "$@") &;;
+  *) child "$@" &;;
+esac
+job=$!
+while kill -0 "$job" 2>/dev/null; do
+    [ "$stopping" = 0 ] || break
+    mem=$(available)
+    case "$mem" in ''|*[!0-9]*) mem=0;; esac
+    if [ "$mem" -lt 24576 ]; then resource_stop=1; stop_child; break; fi
+    sleep 2
+done
+wait "$job"; rc=$?; job=
+peak=$(cat "$CG/memory.max_usage_in_bytes" 2>/dev/null || echo unknown)
+hits=$(cat "$CG/memory.failcnt" 2>/dev/null || echo unknown)
+[ "$resource_stop" = 0 ] || rc=137
+[ "$hits" = 0 ] || rc=137
+if [ "$kind" = validate ]; then
+    echo "RD03_VALIDATION_EXIT=$rc CGROUP_PEAK_BYTES=$peak LIMIT_HITS=$hits" >&2
+    [ "$rc" = 0 ] || touch "$CRASHDIR/.start_error"
+    exit "$rc"
+fi
+# Both failure and an unexpected clean core exit must remove traffic interception.
+if [ "$stopping" = 0 ]; then touch "$CRASHDIR/.start_error"; fi
+"$CRASHDIR/starts/fw_stop.sh" >/dev/null 2>&1 || :
+if [ "$stopping" != 0 ]; then exit 0; fi
+touch "$CRASHDIR/.start_error"
+mkdir -p "$STATE"
+printf 'date=%s\nexit=%s\ncgroup_peak_bytes=%s\nlimit_hits=%s\nreserve_stop=%s\n' \
+    "$(date +%Y%m%d-%H%M%S)" "$rc" "$peak" "$hits" "$resource_stop" > "$STATE/service-last-exit.txt"
+logger -t rd03-memory "Core stopped: exit=$rc peak=$peak limit_hits=$hits; traffic hooks removed; no respawn."
+[ "$rc" != 0 ] || rc=1
+exit "$rc"

@@ -1,0 +1,11 @@
+{
+  "name": "minimal",
+  "branding": "RD03 自定义版本",
+  "features": {
+    "ssh": true,
+    "sftp": true,
+    "wol": false,
+    "shellcrash": false,
+    "custom_web_upgrade": true
+  }
+}

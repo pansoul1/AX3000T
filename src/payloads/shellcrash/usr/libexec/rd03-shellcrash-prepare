@@ -1,0 +1,74 @@
+#!/bin/sh
+# Version-checked integration; original subscriptions and saved devices stay intact.
+set -eu
+umask 077
+CRASHDIR=/data/ShellCrash
+STATE=/data/rd03-memory
+ASSETS=/usr/share/rd03-memory
+[ -d "$CRASHDIR" ] || exit 0
+[ ! -L "$CRASHDIR" ] && [ ! -L "$STATE" ] || exit 1
+mkdir -p "$STATE" /tmp/ShellCrash
+chmod 700 "$STATE"
+stop() { touch "$CRASHDIR/.dis_startup" "$CRASHDIR/.start_error"; logger -t rd03-memory "$*"; echo "RD03: $*" >&2; exit 1; }
+digest() { openssl dgst -sha256 "$1" 2>/dev/null | awk '{print $NF}'; }
+[ "$(cat /proc/xiaoqiang/model)" = RD03 ] || stop 'Model mismatch'
+[ -s "$CRASHDIR/configs/command.env" ] && [ -s "$CRASHDIR/configs/ShellCrash.cfg" ] || stop 'ShellCrash configuration missing'
+grep -Eq '^start_old=.?ON.?$' "$CRASHDIR/configs/ShellCrash.cfg" && stop 'Disable legacy watchdog mode before using this integration'
+if grep -q '^firewall_area=' "$CRASHDIR/configs/ShellCrash.cfg"; then
+    grep -Fxq 'firewall_area=1' "$CRASHDIR/configs/ShellCrash.cfg" || stop 'This integration supports LAN transparent proxy mode'
+fi
+grep -Fxq 'TMPDIR=/tmp/ShellCrash' "$CRASHDIR/configs/command.env" && \
+grep -Fxq 'BINDIR=/tmp/ShellCrash' "$CRASHDIR/configs/command.env" || stop 'Custom runtime directories require review'
+grep -Eq '^crashcore=.?meta.?$' "$CRASHDIR/configs/ShellCrash.cfg" || stop 'This integration supports the tested Mihomo core'
+if grep -q '^core_v=' "$CRASHDIR/configs/ShellCrash.cfg"; then
+    grep -Fxq 'core_v=v1.19.17' "$CRASHDIR/configs/ShellCrash.cfg" || stop 'Core version changed; integration review required'
+fi
+if [ ! -f /tmp/rd03-rom-core-verified ]; then
+    [ "$(digest /usr/libexec/CrashCore)" = '97e4d67653e213f1e857e55d030633faae9228d8c46696c3303251c0412960ed' ] || stop 'Embedded core checksum failed'
+    /usr/libexec/CrashCore -v | grep -q 'v1.19.17 linux arm64' || stop 'Embedded core version failed'
+    touch /tmp/rd03-rom-core-verified
+fi
+# Check every script before replacing any, including previous integrated versions.
+while read -r rel; do
+    [ -s "$CRASHDIR/$rel" ] || stop "Missing script $rel"
+    hash=$(digest "$CRASHDIR/$rel")
+    grep -Fxq "$rel $hash" "$ASSETS/allowed-sources.txt" || stop "Unsupported script $rel"
+done < "$ASSETS/template-list.txt"
+plain='COMMAND="$TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml"'
+guarded='COMMAND="/usr/libexec/rd03-core-guard run $TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml"'
+grep -Fxq "$plain" "$CRASHDIR/configs/command.env" || grep -Fxq "$guarded" "$CRASHDIR/configs/command.env" || stop 'Custom COMMAND requires review'
+if [ ! -f "$STATE/PANSOUL2-prepared" ]; then
+    [ -z "$(pidof CrashCore 2>/dev/null)" ] || stop 'Stop the current core before first integration'
+    touch "$CRASHDIR/.dis_startup" "$CRASHDIR/.start_error"
+    backup="$STATE/pansoul2-originals-$(date +%Y%m%d-%H%M%S)-$$"
+    mkdir -m 700 "$backup" "$backup/starts" "$backup/configs"
+    while read -r rel; do cp -p "$CRASHDIR/$rel" "$backup/$rel"; done < "$ASSETS/template-list.txt"
+    cp -p "$CRASHDIR/configs/command.env" "$backup/configs/command.env"
+    [ ! -f /etc/init.d/shellcrash ] || cp -p /etc/init.d/shellcrash "$backup/active-service"
+fi
+while read -r rel; do
+    if [ "$(digest "$CRASHDIR/$rel")" != "$(digest "$ASSETS/templates/$rel")" ]; then
+        cp "$ASSETS/templates/$rel" "$CRASHDIR/$rel.rd03-new"
+        chmod 755 "$CRASHDIR/$rel.rd03-new"
+        mv "$CRASHDIR/$rel.rd03-new" "$CRASHDIR/$rel"
+    fi
+done < "$ASSETS/template-list.txt"
+if grep -Fxq "$plain" "$CRASHDIR/configs/command.env"; then
+    awk '/^COMMAND=/ {print "COMMAND=\"/usr/libexec/rd03-core-guard run $TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml\""; next} {print}' \
+        "$CRASHDIR/configs/command.env" > "$CRASHDIR/configs/command.env.rd03-new"
+    mv "$CRASHDIR/configs/command.env.rd03-new" "$CRASHDIR/configs/command.env"
+fi
+grep -q '^core_v=' "$CRASHDIR/configs/ShellCrash.cfg" || printf '\ncore_v=v1.19.17\n' >> "$CRASHDIR/configs/ShellCrash.cfg"
+if [ -z "$(pidof CrashCore 2>/dev/null)" ]; then
+    ln -sf /usr/libexec/CrashCore /tmp/ShellCrash/CrashCore
+fi
+cp "$ASSETS/templates/starts/shellcrash.procd" /etc/init.d/shellcrash
+chmod 755 /etc/init.d/shellcrash
+if [ -f "$CRASHDIR/.dis_startup" ] || [ -f "$CRASHDIR/.start_error" ]; then /etc/init.d/shellcrash disable; fi
+echo 0 > /proc/sys/vm/panic_on_oom
+touch "$STATE/PANSOUL2-prepared"
+# Reclaim only the exact redundant public archive now supplied by verified ROM.
+if [ -f "$CRASHDIR/CrashCore.gz" ] && [ ! -L "$CRASHDIR/CrashCore.gz" ] && \
+   [ "$(digest "$CRASHDIR/CrashCore.gz")" = 915cacd0cd51206ab467a5bd426a758d02272bb3adb7ab1d8ea372e541570778 ]; then
+    rm -f "$CRASHDIR/CrashCore.gz"
+fi

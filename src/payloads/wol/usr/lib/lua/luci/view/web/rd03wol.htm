@@ -1,0 +1,172 @@
+<%
+local ver = require("xiaoqiang.XQVersion").webVersion
+%>
+<%include("web/inc/head")%>
+<title><%:远程开机%> - <%:小米路由器%></title>
+<meta name="viewport" content="width=1200">
+<link href="<%=resource%>/web/css/bc.css?v=<%=ver%>" rel="stylesheet">
+<link href="<%=resource%>/web/css/proset.css?v=<%=ver%>" rel="stylesheet">
+<style>
+#rd03wol .bd { margin-left: 0; padding: 10px 0 34px; }
+#rd03wol .wol-form { width: 760px; margin: 0 auto; }
+#rd03wol .form-item { float: none; min-height: 36px; margin-bottom: 16px; }
+#rd03wol .form-item .k { position: static; display: inline-block; width: 120px; color: #666; line-height: 34px; vertical-align: middle; }
+#rd03wol .form-item .ipt-text { width: 280px; }
+#rd03wol .form-item .mac-input { width: 220px; text-transform: uppercase; }
+#rd03wol .form-control { margin-left: 124px; }
+#rd03wol .form-control .btn span { width: 130px; }
+#rd03wol .form-control .btn { margin-right: 10px; }
+#rd03wol .wol-table { width: 100%; table-layout: fixed; margin-top: 26px; }
+#rd03wol .wol-table th { color: #2673bf; font-weight: normal; padding: 9px 10px; border-bottom: 2px #2673bf solid; }
+#rd03wol .wol-table td { padding: 13px 10px; border-bottom: 1px #d9d9d9 solid; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#rd03wol .wol-table .name { width: 34%; }
+#rd03wol .wol-table .mac { width: 32%; font-family: monospace; }
+#rd03wol .wol-table .time { width: 18%; color: #888; }
+#rd03wol .wol-table .actions { width: 16%; text-align: right; }
+#rd03wol .wol-table .actions a { margin-left: 10px; cursor: pointer; }
+#rd03wol .wol-empty { color: #999; text-align: center; padding: 26px 0; }
+#rd03wol .wol-message { min-height: 24px; margin: 4px 0 0 124px; color: #2673bf; }
+#rd03wol .wol-message.error { color: #d44; }
+</style>
+</head>
+<body>
+<div id="doc">
+    <%include("web/inc/header")%>
+    <div id="bd">
+        <div class="mod-set" id="rd03wol">
+            <div class="hd"><h3><%:远程开机%></h3></div>
+            <div class="bd">
+                <form class="form wol-form" id="wolForm" autocomplete="off">
+                    <div class="form-item">
+                        <label class="k" for="wolName"><%:电脑名称%></label>
+                        <span class="v"><input class="ipt-text" id="wolName" name="name" maxlength="48" type="text" placeholder="例如：客厅电脑"></span>
+                    </div>
+                    <div class="form-item">
+                        <label class="k" for="wolMac"><%:MAC地址%></label>
+                        <span class="v"><input class="ipt-text mac-input" id="wolMac" name="mac" maxlength="17" type="text" placeholder="AA:BB:CC:DD:EE:FF"></span>
+                    </div>
+                    <div class="form-control">
+                        <button class="btn btn-primary btn-l" type="submit"><span><%:保存设备%></span></button>
+                        <button class="btn btn-dft btn-l" type="button" id="wolCancel" style="display:none"><span><%:取消编辑%></span></button>
+                    </div>
+                    <p class="wol-message" id="wolMessage" aria-live="polite"></p>
+                </form>
+                <table class="wol-table" id="wolTable">
+                    <thead><tr><th class="name"><%:电脑名称%></th><th class="mac"><%:MAC地址%></th><th class="time"><%:上次发送%></th><th class="actions"><%:操作%></th></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <p class="wol-empty" id="wolEmpty"><%:还没有保存设备%></p>
+            </div>
+        </div>
+    </div>
+    <%include("web/inc/footer")%>
+</div>
+<%include("web/inc/g.js")%>
+<script>
+(function () {
+    var api = '<%=luci.dispatcher.build_url("web", "rd03wol", "api")%>';
+    var csrf = '';
+    var editingMac = '';
+    var $message = $('#wolMessage');
+
+    function message(text, error) {
+        $message.text(text || '').toggleClass('error', !!error);
+    }
+
+    function value(value) {
+        return value == null ? '' : String(value);
+    }
+
+    function sentTime(time) {
+        if (!time) return '从未';
+        if (typeof time === 'number') {
+            var date = new Date(time * 1000);
+            if (!isNaN(date.getTime())) return date.toLocaleString();
+        }
+        return value(time);
+    }
+
+    function render(data) {
+        var rows = data.devices || [];
+        var $body = $('#wolTable tbody').empty();
+        $('#wolEmpty').toggle(rows.length === 0);
+        $.each(rows, function (_, device) {
+            var $row = $('<tr>');
+            $('<td>').addClass('name').text(value(device.name)).appendTo($row);
+            $('<td>').addClass('mac').text(value(device.mac)).appendTo($row);
+            $('<td>').addClass('time').text(sentTime(device.last_sent)).appendTo($row);
+            var $actions = $('<td>').addClass('actions').appendTo($row);
+            $('<a href="#">').text('唤醒').data('mac', value(device.mac)).addClass('wol-wake').appendTo($actions);
+            $('<a href="#">').text('编辑').data('device', device).addClass('wol-edit').appendTo($actions);
+            $('<a href="#">').text('删除').data('mac', value(device.mac)).addClass('wol-delete').appendTo($actions);
+            $row.appendTo($body);
+        });
+    }
+
+    function request(method, fields) {
+        // Stock g.js telemetry assumes every global Ajax URL contains /api/.
+        // This authenticated page-local endpoint uses /web/rd03wol/api instead.
+        // Keep its events local and handle expired login sessions here.
+        return $.ajax({
+            url: api, type: method, data: fields, dataType: 'json',
+            cache: false, global: false, timeout: 10000
+        }).done(function (data) {
+            if (data && (Number(data.code) === 401 || Number(data.code) === 403)) {
+                window.location.href = window.location.protocol + '//' + window.location.host + '/';
+            }
+        }).error(function (xhr) {
+            if (xhr.status === 401 || xhr.status === 403) {
+                window.location.href = window.location.protocol + '//' + window.location.host + '/';
+            }
+        });
+    }
+
+    function load() {
+        request('GET').done(function (data) {
+            if (Number(data.code) !== 0) { message(data.message || '读取设备失败。', true); return; }
+            csrf = value(data.csrf);
+            render(data);
+        }).error(function () { message('读取设备失败。', true); });
+    }
+
+    function post(fields) {
+        fields.csrf = csrf;
+        return request('POST', fields);
+    }
+
+    $('#wolForm').submit(function (event) {
+        event.preventDefault();
+        var name = $.trim($('#wolName').val());
+        var mac = $.trim($('#wolMac').val()).toUpperCase();
+        if (!name || !/^[0-9A-F]{2}(:[0-9A-F]{2}){5}$/.test(mac)) { message('请填写名称和正确的 MAC 地址。', true); return; }
+        post({action: 'save', name: name, mac: mac}).done(function (data) {
+            if (Number(data.code) !== 0) { message(data.message || '保存失败。', true); return; }
+            csrf = value(data.csrf); render(data); message('设备已保存。'); resetForm();
+        }).error(function () { message('保存失败。', true); });
+    });
+
+    function resetForm() { editingMac = ''; $('#wolName, #wolMac').val(''); $('#wolMac').prop('readonly', false); $('#wolCancel').hide(); }
+    $('#wolCancel').click(function () { resetForm(); message(''); });
+    $('#wolTable').on('click', '.wol-edit', function (event) {
+        event.preventDefault(); var device = $(this).data('device');
+        editingMac = value(device.mac); $('#wolName').val(value(device.name)); $('#wolMac').val(editingMac).prop('readonly', true); $('#wolCancel').show(); $('#wolName').focus();
+    });
+    $('#wolTable').on('click', '.wol-wake', function (event) {
+        event.preventDefault(); var link = this; post({action: 'wake', mac: $(link).data('mac')}).done(function (data) {
+            if (Number(data.code) !== 0) { message(data.message || '发送失败。', true); return; }
+            csrf = value(data.csrf); render(data); message('唤醒包已发送。');
+        }).error(function () { message('发送失败。', true); });
+    });
+    $('#wolTable').on('click', '.wol-delete', function (event) {
+        event.preventDefault(); var mac = $(this).data('mac');
+        if (!window.confirm('删除这个设备？')) return;
+        post({action: 'delete', mac: mac}).done(function (data) {
+            if (Number(data.code) !== 0) { message(data.message || '删除失败。', true); return; }
+            csrf = value(data.csrf); render(data); message('设备已删除。'); resetForm();
+        }).error(function () { message('删除失败。', true); });
+    });
+    load();
+}());
+</script>
+</body>
+</html>

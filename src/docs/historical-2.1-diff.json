@@ -1,0 +1,13 @@
+{
+  "stock_sha256": "042ba08949e547007710caa43830e574a7a7f5964119af4c457409b2fa8b4bce",
+  "historical_21_sha256": "d3a3709631bf41858ca96845e4da22e5f2f17c07faee41dc8a47b8f7ece0997f",
+  "modified_stock_nodes": [
+    "/usr/lib/lua/luci/view/web/inc/header.htm",
+    "/etc/sysctl.conf",
+    "/etc/init.d/dropbear",
+    "/bin/mkxqimage"
+  ],
+  "added_nodes": 46,
+  "removed_stock_nodes": [],
+  "boundary": "Offline byte and metadata comparison against the archived 2.1 image."
+}

@@ -1,0 +1,12 @@
+#!/bin/sh /etc/rc.common
+# Retire only the old external WOL startup hook. Native files need no bind mounts.
+START=18
+STOP=90
+start() {
+    if [ "$(uci -q get firewall.rd03_wol.path)" = /data/rd03-wol/start.sh ]; then
+        uci -q delete firewall.rd03_wol
+        uci commit firewall
+        logger -t rd03-local 'Native WOL is built into ROM; retired the old addon hook.'
+    fi
+    /usr/libexec/rd03-shellcrash-prepare --boot || logger -t rd03-memory "ShellCrash preparation held; stock network continues."
+}

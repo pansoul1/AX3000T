@@ -1,0 +1,23 @@
+{
+  "upstream": "MetaCubeX/meta-rules-dat",
+  "commit": "1852a7d214920d77c753293c49eb26a996e52081",
+  "assets": {
+    "ip": {
+      "local_file": "cn-ip.mrs",
+      "bytes": 38566,
+      "sha256": "794f27a804c7c8272b2b9c6322aa04da34291611fd3b48bc4b761bf43b35da9a",
+      "git_blob_sha1": "206d9e830f49ddf38ee8c797e41d1c0f8a189a88",
+      "source": "https://github.com/MetaCubeX/meta-rules-dat/blob/1852a7d214920d77c753293c49eb26a996e52081/geo/geoip/cn.mrs",
+      "intended_behavior": "ipcidr"
+    },
+    "domain": {
+      "local_file": "cn-domain.mrs",
+      "bytes": 534665,
+      "sha256": "21209c8ff73de954207e10fd817089986b5dad5606836924f88cffdfde9a8a0a",
+      "git_blob_sha1": "536c85a75daaf93fcc0ddea032bdeb2ad3725a17",
+      "source": "https://github.com/MetaCubeX/meta-rules-dat/blob/1852a7d214920d77c753293c49eb26a996e52081/geo/geosite/cn.mrs",
+      "intended_behavior": "domain"
+    }
+  },
+  "boundary": "Pinned Git blob metadata verified; parsed and loaded by official same-version ARM64 Mihomo (IP 10009 / domain 110446 rules) in an isolated test. Included in pansoul 2; new ROM boot/traffic untested. Dataset equivalence to the previous full MMDB is unverified."
+}

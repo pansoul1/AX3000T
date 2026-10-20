@@ -1,0 +1,3 @@
+#!/bin/sh
+unset LD_PRELOAD
+exec /usr/lib/rd03-sftp/ld-musl-aarch64.so.1 --library-path /usr/lib/rd03-sftp:/lib:/usr/lib /usr/lib/rd03-sftp/sftp-server "$@"
