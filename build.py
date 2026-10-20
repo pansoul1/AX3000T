@@ -18,7 +18,7 @@ def main():
     for name in ("build", "plan"):
         p = sub.add_parser(name, help="Build a ROM" if name == "build" else "Check input and list the selected changes")
         p.add_argument("--rom", type=Path, required=True, help="Official RD03 1.0.98 HDR1 .bin")
-        p.add_argument("--profile", type=Path, default=ROOT / "config/pansoul-2.1.json")
+        p.add_argument("--profile", type=Path, default=ROOT / "config/community-2.1.json")
         p.add_argument("--branding", help="Web footer and build label; no password or account information")
         p.add_argument("--name", help="Safe build output name")
         for flag in FEATURES:

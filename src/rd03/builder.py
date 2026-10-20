@@ -60,9 +60,9 @@ def payload_plan(profile, manifest):
     for path, item in manifest.items():
         if path in skip:
             continue
-        if path.endswith("/PANSOUL1") and not flags["wol"]:
+        if path.endswith("/WOL") and not flags["wol"]:
             continue
-        if path.endswith("/PANSOUL2") and not flags["shellcrash"]:
+        if path.endswith("/SHELLCRASH") and not flags["shellcrash"]:
             continue
         if item["module"] != "common" and not flags[item["module"]]:
             continue

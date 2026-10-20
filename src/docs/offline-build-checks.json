@@ -2,10 +2,10 @@
   "kind": "offline acceptance",
   "builds": [
     {
-      "name": "pansoul-2.1",
+      "name": "community-2.1",
       "profile": {
-        "name": "pansoul-2.1",
-        "branding": "pansoul 定制版本 2.1",
+        "name": "community-2.1",
+        "branding": "AX3000T 社区固件 2.1",
         "features": {
           "ssh": true,
           "sftp": true,
@@ -14,7 +14,7 @@
           "custom_web_upgrade": true
         }
       },
-      "sha256": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
+      "sha256": "2a0c57548e5e7b62139ebcf897438f18a6fbefcaa59324aef615cd09e0740a6a",
       "bytes": 34735112,
       "system_ubi_bytes": 34734080,
       "kernel_identical": true,
@@ -70,7 +70,7 @@
           "custom_web_upgrade": false
         }
       },
-      "sha256": "0497b578f8978c6c20d1ce8c5ff39afca9d9c616237a77811a9ac9ab1c8c151b",
+      "sha256": "23b5ef654f941c69bb51ed5a835176e35df6b584abfd9a3313a0b6634ca4be55",
       "bytes": 24773640,
       "system_ubi_bytes": 24772608,
       "kernel_identical": true,
@@ -89,42 +89,29 @@
   "python": "3.13",
   "squashfs_tools_ng": "1.3.2",
   "profile_matrix_valid_combinations": 20,
-  "python_regression_tests_passed": 16,
-  "wol_go_tests": "passed",
-  "all_shell_payloads_syntax": "passed",
-  "powershell_preparation_syntax": "passed",
-  "archive_21_unchanged": true,
-  "repeated_full_build_sha256": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
+  "python_regression_tests_passed": 17,
   "repeat_build_byte_identical": true,
-  "router_actions": [],
-  "directory_reorganization": {
-    "date": "2026-10-20",
-    "major_root_folders": [
-      "config",
-      "src",
-      "firmware"
-    ],
-    "local_work_directory": ".work",
-    "full_build_sha256_after_move": "d388596019988ea453e64ac95071ad99c83ca92f792326a04de13e2b9e66f159",
-    "byte_identical_to_before_move": true,
-    "python_regression_tests_passed": 10,
-    "wol_runtime_rebuild": "passed",
-    "preparation_generation": "passed; no router connection",
-    "relative_markdown_links_checked": 12,
+  "repeated_full_build_sha256": "2a0c57548e5e7b62139ebcf897438f18a6fbefcaa59324aef615cd09e0740a6a",
+  "published_firmware_sha256": "2a0c57548e5e7b62139ebcf897438f18a6fbefcaa59324aef615cd09e0740a6a",
+  "delivery_audit": {
+    "rootfs_personal_brand_hits": [],
+    "payload_personal_brand_hits": [],
+    "original_stock_nodes_removed": [],
+    "relative_markdown_links_checked": 21,
+    "shell_payloads_syntax_checked": 15,
+    "rootfs_nodes_scanned": 4340,
     "router_actions": []
   },
-  "first_flash_bootstrap": {
-    "date": "2026-10-20",
+  "powershell_syntax": "passed for both entrypoints",
+  "first_flash": {
     "entrypoint": "First-Flash.ps1",
-    "powershell_5_1_check_only": "passed on the archived 2.1 image and pinned official input",
-    "powershell_missing_and_invalid_rom_rejected": true,
+    "powershell_5_1_check_only": "passed using the published community 2.1 image and pinned official input",
     "adapter_fake_gateway_tests_passed": 6,
-    "adapter_tests_on_upstream_python_3_8": "passed",
-    "upstream_windows_runtime_imports": "passed",
+    "unlock_method_origin": "third-party openwrt-xiaomi/xmir-patcher connect5.py",
+    "project_scope": "PowerShell entry, RD03/version adapter, password handoff and ROM verifier preparation",
     "upstream_commit": "16a46e350e3de2cb3415ab2cb652df53783998dc",
     "upstream_archive_sha256": "b33edcf1b5a6406d12428d681e0e117a86826a56fae7ed03ac99c1fc556bdc56",
-    "relative_markdown_links_checked": 13,
-    "hardware_test": "NOT PERFORMED for first-flash SSH unlock or RAM mount",
-    "router_actions": []
-  }
+    "hardware_test": "NOT PERFORMED for the first-flash adapter or newly generated community firmware"
+  },
+  "router_actions": []
 }

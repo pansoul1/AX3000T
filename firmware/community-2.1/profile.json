@@ -1,0 +1,11 @@
+{
+  "name": "community-2.1",
+  "branding": "AX3000T 社区固件 2.1",
+  "features": {
+    "ssh": true,
+    "sftp": true,
+    "wol": true,
+    "shellcrash": true,
+    "custom_web_upgrade": true
+  }
+}

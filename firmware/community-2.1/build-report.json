@@ -1,0 +1,154 @@
+{
+  "profile": {
+    "name": "community-2.1",
+    "branding": "AX3000T 社区固件 2.1",
+    "features": {
+      "ssh": true,
+      "sftp": true,
+      "wol": true,
+      "shellcrash": true,
+      "custom_web_upgrade": true
+    }
+  },
+  "stock_sha256": "042ba08949e547007710caa43830e574a7a7f5964119af4c457409b2fa8b4bce",
+  "sha256": "2a0c57548e5e7b62139ebcf897438f18a6fbefcaa59324aef615cd09e0740a6a",
+  "bytes": 34735112,
+  "ubi": {
+    "image_bytes": 34734080,
+    "peb_size": 131072,
+    "vid_offset": 2048,
+    "data_offset": 4096,
+    "leb_size": 126976,
+    "image_sequence": 1719461964,
+    "eof_markers": 5,
+    "pebs": 265,
+    "volumes": {
+      "kernel": {
+        "volume_id": 0,
+        "reserved_ebs": 23,
+        "type": 1,
+        "autoresize": false,
+        "payload_sha256": "3ce090d347cb5fc191aec037d659318c2ac56d2381770278530b58705f86acad",
+        "payload_ebs": 23
+      },
+      "rootfs": {
+        "volume_id": 1,
+        "reserved_ebs": 235,
+        "type": 1,
+        "autoresize": false,
+        "payload_sha256": "a86769fe931d80e0ed3b801492559da47e7eeb23c2ed43f804c07bcc355b30d1",
+        "payload_ebs": 235
+      }
+    }
+  },
+  "system_slot_bytes": 35651584,
+  "slot_margin_bytes": 917504,
+  "squashfs": {
+    "filesystem_bytes": 29765334,
+    "inode_count": 4340,
+    "mtime": 1756114009,
+    "block_size": 262144,
+    "compression_id": 4,
+    "version": "4.0",
+    "sha256": "dc2de3e778d7286db85958f047ff5717da88372a1c1faf7691d1eb7639178f37"
+  },
+  "kernel_identical": true,
+  "kernel_fit": {
+    "fit_bytes": 2870416,
+    "sha256": "b23f7d86bde02f1bb4620ff2f215401ced6db8825c6ee9952550d7ee3b4594ae",
+    "default_configuration": "config@1",
+    "images": {
+      "/images/kernel@1": {
+        "bytes": 2849304,
+        "sha256": "da6524abf51ead7343a4df7921881f3c2deb7ca73734dcd8dce7dae65209202a",
+        "verified_hashes": [
+          "crc32",
+          "sha1"
+        ],
+        "type": "kernel",
+        "compression": "lzma"
+      },
+      "/images/fdt@1": {
+        "bytes": 19231,
+        "sha256": "f9decec9b76606e9e91d1b08b735901564ce4614c400064e9cb4fbf4ac523bfb",
+        "verified_hashes": [
+          "crc32",
+          "sha1"
+        ],
+        "type": "flat_dt",
+        "compression": "none"
+      }
+    }
+  },
+  "changed_stock_files": [
+    "/bin/mkxqimage",
+    "/etc/init.d/dropbear",
+    "/etc/sysctl.conf",
+    "/usr/lib/lua/luci/view/web/inc/footer.htm",
+    "/usr/lib/lua/luci/view/web/inc/header.htm"
+  ],
+  "added_files_and_links": [
+    "/etc/init.d/rd03-local",
+    "/etc/init.d/shellcrash",
+    "/etc/rc.d/S18rd03-local",
+    "/etc/rc.d/S99shellcrash",
+    "/usr/bin/crash",
+    "/usr/bin/rd03-space-clean",
+    "/usr/lib/lua/luci/controller/rd03_wol.lua",
+    "/usr/lib/lua/luci/view/web/rd03wol.htm",
+    "/usr/lib/rd03-admin-auth.so",
+    "/usr/lib/rd03-sftp/ld-musl-aarch64.so.1",
+    "/usr/lib/rd03-sftp/libc.so",
+    "/usr/lib/rd03-sftp/libgcc_s.so.1",
+    "/usr/lib/rd03-sftp/sftp-server",
+    "/usr/libexec/CrashCore",
+    "/usr/libexec/rd03-admin-check.lua",
+    "/usr/libexec/rd03-core-guard",
+    "/usr/libexec/rd03-prepare-config",
+    "/usr/libexec/rd03-shellcrash-install",
+    "/usr/libexec/rd03-shellcrash-prepare",
+    "/usr/libexec/rd03-ssh-prepare",
+    "/usr/libexec/rd03-wol-api",
+    "/usr/libexec/sftp-server",
+    "/usr/share/rd03-local/BUILD.txt",
+    "/usr/share/rd03-local/SHELLCRASH",
+    "/usr/share/rd03-local/ShellCrash-1.9.4.tar.gz",
+    "/usr/share/rd03-local/WOL",
+    "/usr/share/rd03-local/check-web.lua",
+    "/usr/share/rd03-local/profile.json",
+    "/usr/share/rd03-memory/allowed-sources.txt",
+    "/usr/share/rd03-memory/prepare-config.awk",
+    "/usr/share/rd03-memory/rule-sources.json",
+    "/usr/share/rd03-memory/rules/cn-domain.mrs",
+    "/usr/share/rd03-memory/rules/cn-ip.mrs",
+    "/usr/share/rd03-memory/template-list.txt",
+    "/usr/share/rd03-memory/templates/starts/afstart.sh",
+    "/usr/share/rd03-memory/templates/starts/bfstart.sh",
+    "/usr/share/rd03-memory/templates/starts/check_core.sh",
+    "/usr/share/rd03-memory/templates/starts/clash_check.sh",
+    "/usr/share/rd03-memory/templates/starts/clash_modify.sh",
+    "/usr/share/rd03-memory/templates/starts/shellcrash.procd",
+    "/usr/share/rd03-memory/templates/starts/start_error.sh"
+  ],
+  "added_directories": [
+    "/usr/lib/rd03-sftp",
+    "/usr/share/rd03-local",
+    "/usr/share/rd03-memory",
+    "/usr/share/rd03-memory/rules",
+    "/usr/share/rd03-memory/templates",
+    "/usr/share/rd03-memory/templates/starts"
+  ],
+  "removed_stock_nodes": [],
+  "all_other_official_content_and_metadata_identical": true,
+  "components": [
+    "firmware_ubi.bin",
+    "xiaoqiang_version"
+  ],
+  "vendor_signature_valid": false,
+  "private_configuration_included": false,
+  "hardware_test": "NOT PERFORMED for this newly generated ROM",
+  "toolchain": {
+    "sqfs2tar": "sqfs2tar.exe",
+    "tar2sqfs": "tar2sqfs.exe"
+  }
+}

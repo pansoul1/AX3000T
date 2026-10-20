@@ -10,7 +10,7 @@ WORK = ROOT / ".work"
 FEATURES = ("ssh", "sftp", "wol", "shellcrash", "custom_web_upgrade")
 STOCK_SHA256 = "042ba08949e547007710caa43830e574a7a7f5964119af4c457409b2fa8b4bce"
 STOCK_URL = "https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/rom/rd03/miwifi_rd03_firmware_48abd_1.0.98.bin"
-RELEASE_SHA256 = "d3a3709631bf41858ca96845e4da22e5f2f17c07faee41dc8a47b8f7ece0997f"
+RELEASE_SHA256 = "2a0c57548e5e7b62139ebcf897438f18a6fbefcaa59324aef615cd09e0740a6a"
 
 
 def load_profile(path: Path) -> dict:

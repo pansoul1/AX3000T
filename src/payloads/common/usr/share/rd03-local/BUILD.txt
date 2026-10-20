@@ -1,1 +1,1 @@
-pansoul custom edition 2.1. Xiaomi RD03 stock 1.0.98 + SSH/SFTP + native WOL + guarded ROM ShellCrash + native web upgrades without vendor RSA. Unsigned. 2026-10-18.
+AX3000T community firmware 2.1. Xiaomi RD03 stock 1.0.98. Unsigned.

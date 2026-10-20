@@ -19,5 +19,5 @@
       "intended_behavior": "domain"
     }
   },
-  "boundary": "Pinned Git blob metadata verified; parsed and loaded by official same-version ARM64 Mihomo (IP 10009 / domain 110446 rules) in an isolated test. Included in pansoul 2; new ROM boot/traffic untested. Dataset equivalence to the previous full MMDB is unverified."
+  "boundary": "Pinned Git blob metadata verified; parsed and loaded by official same-version ARM64 Mihomo (IP 10009 / domain 110446 rules) in an isolated test. Included in RD03 community firmware; new ROM boot/traffic untested. Dataset equivalence to the previous full MMDB is unverified."
 }

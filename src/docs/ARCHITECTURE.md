@@ -15,7 +15,7 @@
   → 验证原内核卷完全一致，生成无小米有效签名的 HDR1
 ```
 
-没有把整个文件系统先解压到 Windows NTFS 再重新打包，避免权限、符号链接和设备节点丢失。UBI 重建用 Python 完成，不依赖仅在开发机存在的定制 `ubinize.exe`。重复打包归档 2.1 的 UBI 可恢复相同字节，回归测试覆盖这一点。
+没有把整个文件系统先解压到 Windows NTFS 再重新打包，避免权限、符号链接和设备节点丢失。UBI 重建用 Python 完成，不依赖仅在开发机存在的定制 `ubinize.exe`。重复打包当前成品的 UBI 可恢复相同字节，回归测试覆盖这一点。
 
 仅输出版本信息 `xiaoqiang_version` 和系统 `firmware_ubi.bin` 两个组件。保留原内核、UBI 页面/擦除块几何、镜像序号、官方升级元数据及原系统槽上限；rootfs 卷占用会随所选组件变化，不改变 NAND 分区表。
 
@@ -27,9 +27,9 @@
 | `/usr/lib/lua/luci/view/web/inc/header.htm` | WOL | 在原有路由/AP/Mesh 导航分支增加“远程开机” |
 | `/etc/sysctl.conf` | ShellCrash | `vm.panic_on_oom=2` 改为 `0`，降低内存耗尽直接触发整机 panic 的风险 |
 | `/bin/mkxqimage` | 定制包升级 | 将固定 AArch64 虚拟地址 `0x2180` 的条件跳转改为无条件跳转，跳过 RSA 判断 |
-| `/usr/lib/lua/luci/view/web/inc/footer.htm` | 新构建器 | 将原版本显示替换为经过 HTML 转义的 `branding` 文本 |
+| `/usr/lib/lua/luci/view/web/inc/footer.htm` | 所有构建 | 将原版本显示替换为经过 HTML 转义的 `branding` 文本 |
 
-最后一项不属于原样归档的 2.1；构建器没有冒充“同一摘要的历史成品”。所有其他官方文件必须与输入的内容和元数据一致，否则不交付 `.bin`。
+公开的社区版 2.1 由当前构建器重新生成，默认配置和固件内标记均使用中性名称，有独立校验值。所有其他官方文件必须与输入的内容和元数据一致，否则不交付 `.bin`。
 
 ## SSH 与 SFTP
 

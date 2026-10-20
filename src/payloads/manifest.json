@@ -58,8 +58,8 @@
     "mtime": 1756114009,
     "module": "wol",
     "source": "payloads/wol/usr/bin/rd03-space-clean",
-    "sha256": "f8d528891a8e2bac4c5c4438c1cbd8af7eb13d0e05bf29234955fee6557d6777",
-    "bytes": 2026
+    "sha256": "8e2491a9a876ced12ac866c9422513946a5d9483b32f62395b4600ce19f34797",
+    "bytes": 2035
   },
   "/usr/lib/lua/luci/controller/rd03_wol.lua": {
     "type": 32768,
@@ -198,8 +198,8 @@
     "mtime": 1756114009,
     "module": "shellcrash",
     "source": "payloads/shellcrash/usr/libexec/rd03-shellcrash-install",
-    "sha256": "26151f13ab94a340492a6be1c1e637053a58ff305c4da15ca508356b140b7749",
-    "bytes": 2389
+    "sha256": "254800a8b838bef03b3e502d9247016ed05aa2f5add6f41ddef449f8bad0a63e",
+    "bytes": 2386
   },
   "/usr/libexec/rd03-shellcrash-prepare": {
     "type": 32768,
@@ -209,8 +209,8 @@
     "mtime": 1756114009,
     "module": "shellcrash",
     "source": "payloads/shellcrash/usr/libexec/rd03-shellcrash-prepare",
-    "sha256": "e4f24aac20feb1560c63d112dd5213e0280bf37f4a8af2d77c7a73bdb835163a",
-    "bytes": 4666
+    "sha256": "ac5af1702fd5e94141a9c295e6977c775ac7f0946a5c565eb774d9d7da4f07c7",
+    "bytes": 4651
   },
   "/usr/libexec/rd03-ssh-prepare": {
     "type": 32768,
@@ -261,30 +261,30 @@
     "mtime": 1756114009,
     "module": "common",
     "source": "payloads/common/usr/share/rd03-local/BUILD.txt",
-    "sha256": "800f4432d0825cc90afe2fcec1499b0590965d1e4feaab33ec163584b6502526",
-    "bytes": 166
+    "sha256": "70bd20193be957ffa4ffa98caf3c895fc4ed0b3b4120f439865f3dd6c7a5f7c4",
+    "bytes": 68
   },
-  "/usr/share/rd03-local/PANSOUL1": {
+  "/usr/share/rd03-local/WOL": {
     "type": 32768,
     "mode": 33188,
     "uid": 0,
     "gid": 0,
     "mtime": 1756114009,
     "module": "common",
-    "source": "payloads/common/usr/share/rd03-local/PANSOUL1",
-    "sha256": "07ec974233381dcbe6ef8e6b67db1382cf8f8fe1db1de99a4ee36c3de8a73dbe",
-    "bytes": 59
+    "source": "payloads/common/usr/share/rd03-local/WOL",
+    "sha256": "36cba3b69b0a3fd459b26bbea309d5c18e93fbb36ce511d544431893af97c54e",
+    "bytes": 35
   },
-  "/usr/share/rd03-local/PANSOUL2": {
+  "/usr/share/rd03-local/SHELLCRASH": {
     "type": 32768,
     "mode": 33188,
     "uid": 0,
     "gid": 0,
     "mtime": 1756114009,
     "module": "common",
-    "source": "payloads/common/usr/share/rd03-local/PANSOUL2",
-    "sha256": "d00aa150c3657343c091811481ca13436a24ccb96feadf7af1bb5a9a37438d28",
-    "bytes": 52
+    "source": "payloads/common/usr/share/rd03-local/SHELLCRASH",
+    "sha256": "2b03b38072c013d293d1f9d1191503192ac6c60724a589bab0f7498e3f1b0d46",
+    "bytes": 47
   },
   "/usr/share/rd03-local/ShellCrash-1.9.4.tar.gz": {
     "type": 32768,
@@ -346,8 +346,8 @@
     "mtime": 1756114009,
     "module": "shellcrash",
     "source": "payloads/shellcrash/usr/share/rd03-memory/rule-sources.json",
-    "sha256": "ed07d592aa3bbca1b72932b0c25149c9343fff64b6feb4dbf5b444783c486eec",
-    "bytes": 1204
+    "sha256": "c6b6959d96fc274f32e00ac183db4512fe8c751246263d11205db50400deaf3d",
+    "bytes": 1195
   },
   "/usr/share/rd03-memory/rules": {
     "type": 16384,

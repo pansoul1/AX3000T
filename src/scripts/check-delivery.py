@@ -38,6 +38,13 @@ for folder in args.build:
             changed.append(path)
             require(path in planned and output_fs.get(path).open().read() == planned[path], "Unexpected stock modification")
     require(set(changed) == set(planned), "Planned stock modification missing")
+    for path, spec in additions.items():
+        require(path in rows, "Selected payload missing: " + path)
+        require((rows[path]["mode"] & 0o7777) == spec["mode"], "Payload permissions differ: " + path)
+        if "data" in spec:
+            require(output_fs.get(path).open().read() == spec["data"], "Payload content differs: " + path)
+        else:
+            require(rows[path]["target"] == spec["target"], "Payload link differs: " + path)
     flags = profile["features"]
     for feature, path in [("ssh", "/usr/lib/rd03-admin-auth.so"), ("sftp", "/usr/libexec/sftp-server"),
                           ("wol", "/usr/libexec/rd03-wol-api"), ("shellcrash", "/usr/libexec/CrashCore")]:

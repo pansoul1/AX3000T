@@ -36,6 +36,8 @@ class ProfileTests(unittest.TestCase):
             self.assertEqual("/usr/lib/lua/luci/controller/rd03_wol.lua" in additions, flags["wol"])
             self.assertEqual("/usr/lib/rd03-admin-auth.so" in additions, flags["ssh"])
             self.assertEqual("/usr/libexec/sftp-server" in additions, flags["sftp"])
+            self.assertEqual("/usr/share/rd03-local/WOL" in additions, flags["wol"])
+            self.assertEqual("/usr/share/rd03-local/SHELLCRASH" in additions, flags["shellcrash"])
             init = additions.get("/etc/init.d/rd03-local", {}).get("data", b"")
             self.assertEqual(b"rd03-shellcrash-prepare" in init, flags["shellcrash"])
             self.assertEqual(b"firewall.rd03_wol" in init, flags["wol"])
@@ -64,17 +66,17 @@ class ProfileTests(unittest.TestCase):
                 normalize(path)
 
 
-class HistoricalReleaseTests(unittest.TestCase):
+class ReleaseTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.data = (ROOT / "firmware/pansoul-2.1/RD03-1.0.98-pansoul2.1-web.bin").read_bytes()
+        cls.data = (ROOT / "firmware/community-2.1/RD03-1.0.98-community-2.1-custom-web.bin").read_bytes()
         cls.parts = validate_hdr1(cls.data)
 
-    def test_historical_release_unchanged(self):
+    def test_published_release_checksum(self):
         self.assertEqual(sha256(self.data), RELEASE_SHA256)
         self.assertEqual(set(self.parts), {"xiaoqiang_version", "firmware_ubi.bin"})
 
-    def test_native_branch_matches_historical_verifier(self):
+    def test_native_branch_matches_release_verifier(self):
         info = inspect_ubi(self.parts["firmware_ubi.bin"])
         _, fs = inventory(info["volumes"]["rootfs"]["payload"])
         data = fs.get("/bin/mkxqimage").open().read()
@@ -82,7 +84,21 @@ class HistoricalReleaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             patch_verifier(data)  # Double patching must not silently succeed.
 
-    def test_ubi_repack_preserves_historical_bytes(self):
+    def test_release_profile_and_feature_markers(self):
+        info = inspect_ubi(self.parts["firmware_ubi.bin"])
+        rows, fs = inventory(info["volumes"]["rootfs"]["payload"])
+        expected = load_profile(ROOT / "config/community-2.1.json")
+        self.assertEqual(json.loads(fs.get("/usr/share/rd03-local/profile.json").open().read()), expected)
+        self.assertIn(expected["branding"].encode(), fs.get("/usr/lib/lua/luci/view/web/inc/footer.htm").open().read())
+        for path in ("/usr/share/rd03-local/WOL", "/usr/share/rd03-local/SHELLCRASH"):
+            self.assertIn(path, rows)
+        for path in rows:
+            self.assertNotIn("pansoul", path.lower())
+        for path in ("/usr/share/rd03-local/BUILD.txt", "/usr/libexec/rd03-shellcrash-install",
+                     "/usr/libexec/rd03-shellcrash-prepare", "/usr/bin/rd03-space-clean"):
+            self.assertNotIn(b"pansoul", fs.get(path).open().read().lower())
+
+    def test_ubi_repack_preserves_release_bytes(self):
         data = self.parts["firmware_ubi.bin"]
         root = inspect_ubi(data)["volumes"]["rootfs"]["payload"]
         self.assertEqual(repack_ubi(data, root), data)

@@ -2,7 +2,7 @@
 # Remove only hash-matched files from our previous external WOL addon.
 # devices.json, user data, and every original Xiaomi file are preserved.
 set -eu
-[ -f /usr/share/rd03-local/PANSOUL1 ] || { echo 'This requires pansoul edition 1.' >&2; exit 1; }
+[ -f /usr/share/rd03-local/WOL ] || { echo 'This requires the native RD03 WOL integration.' >&2; exit 1; }
 if grep -q ' /usr/lib/lua/luci/controller ' /proc/mounts || grep -q ' /usr/lib/lua/luci/view/web ' /proc/mounts; then
     echo 'An external web mount is active. Reboot into the new ROM before cleanup.' >&2
     exit 1

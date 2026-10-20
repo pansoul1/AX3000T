@@ -15,10 +15,10 @@ mkdir -m 700 "$CRASHDIR"
 tar -xzf "$PAYLOAD" -C "$CRASHDIR"
 # This ROM already owns SSH authentication. Avoid upstream's duplicate SSH
 # patch and its automatic deletion of stock logs/configuration backups.
-sed -i '/^[[:space:]]*autoSSH #/s/^/# pansoul: /; /^[[:space:]]*auto_clean #/s/^/# pansoul: /' "$CRASHDIR/starts/snapshot_init.sh"
+sed -i '/^[[:space:]]*autoSSH #/s/^/# rd03: /; /^[[:space:]]*auto_clean #/s/^/# rd03: /' "$CRASHDIR/starts/snapshot_init.sh"
 mkdir -p "$CRASHDIR/configs" "$CRASHDIR/yamls" /tmp/ShellCrash
 cat > "$CRASHDIR/configs/ShellCrash.cfg" <<'EOF'
-# Initial defaults for RD03 pansoul edition. Further settings belong to ShellCrash.
+# Initial defaults for RD03 community firmware. Further settings belong to ShellCrash.
 mini_clash=ON
 crashcore=meta
 cpucore=arm64

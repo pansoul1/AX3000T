@@ -4,6 +4,8 @@ Prepare an RD03 running official 1.0.98 for its first custom web upgrade.
 .DESCRIPTION
 Validates both images, enables SSH through a pinned XMiR-Patcher smartcontroller
 adapter if needed, then temporarily mounts the native ROM verifier patch.
+The SSH exploit is third-party XMiR-Patcher connect5.py, not this project's work.
+This project's PowerShell entry and Python adapter validate and join the steps.
 The firmware upload remains a manual step in the Xiaomi web interface.
 CheckOnly validates local files without downloading or contacting a router.
 #>
@@ -30,7 +32,7 @@ if (-not [Net.IPAddress]::TryParse($Router, [ref]$routerAddress) -or
     throw 'Router must be the IPv4 address of your own RD03.'
 }
 if (-not $Firmware) {
-    $Firmware = Join-Path $repoRoot 'firmware\pansoul-2.1\RD03-1.0.98-pansoul2.1-web.bin'
+    $Firmware = Join-Path $repoRoot 'firmware\community-2.1\RD03-1.0.98-community-2.1-custom-web.bin'
 }
 $firmwarePath = (Resolve-Path -LiteralPath $Firmware).Path
 if (-not $Rom) {
@@ -75,7 +77,7 @@ if ($LASTEXITCODE -ne 0) {
     & $Python -m pip install -r (Join-Path $repoRoot 'requirements.txt')
     if ($LASTEXITCODE -ne 0) { throw 'Python dependency installation failed; router untouched.' }
 }
-Write-Host 'Validating official input, custom firmware, model, CRC and unchanged kernel...'
+Write-Host '[1/4] Validating official input, custom firmware, model, CRC and unchanged kernel...'
 & $Python -X utf8 (Join-Path $repoRoot 'build.py') verify --image $firmwarePath --stock $romPath
 if ($LASTEXITCODE -ne 0) { throw 'Local firmware validation failed; router untouched.' }
 if ($CheckOnly) {
@@ -117,6 +119,8 @@ function Test-SshBanner {
 }
 
 if (-not $SkipSshUnlock -and -not (Test-SshBanner)) {
+    Write-Host '[2/4] SSH unlock: third-party openwrt-xiaomi/xmir-patcher (connect5.py).'
+    Write-Host 'This project supplies the RD03 adapter, password handoff and upgrade preparation.'
     $cacheRoot = Join-Path $repoRoot '.work\cache'
     New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
     $archive = Join-Path $cacheRoot ('xmir-patcher-' + $xmirRevision + '.zip')
@@ -152,9 +156,12 @@ if (-not $SkipSshUnlock -and -not (Test-SshBanner)) {
     if (-not (Test-SshBanner)) { throw 'No SSH server after unlock; ROM preparation was not run.' }
 }
 else {
+    Write-Host '[2/4] SSH is already available, or unlock was explicitly skipped.'
     Write-Host 'Using the existing SSH service. Enter its CURRENT working password when asked.'
 }
 
+Write-Host '[3/4] Preparing the stock ROM verifier for this upload; this does not flash firmware.'
 & (Join-Path $repoRoot 'src\scripts\Prepare-WebUpgrade.ps1') -Router $Router -Rom $romPath -Firmware $firmwarePath -Python $Python -SshPath $SshPath
+Write-Host '[4/4] MANUAL STEP: Xiaomi web management > System upgrade > Manual upgrade.'
 Write-Host ('Firmware to upload in the Xiaomi web interface: ' + $firmwarePath)
 Write-Host 'Keep the router powered on until the manual upload. This script has not flashed or rebooted it.'

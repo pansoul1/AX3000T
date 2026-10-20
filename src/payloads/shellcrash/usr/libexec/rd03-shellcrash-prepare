@@ -37,10 +37,10 @@ done < "$ASSETS/template-list.txt"
 plain='COMMAND="$TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml"'
 guarded='COMMAND="/usr/libexec/rd03-core-guard run $TMPDIR/CrashCore -d $BINDIR -f $TMPDIR/config.yaml"'
 grep -Fxq "$plain" "$CRASHDIR/configs/command.env" || grep -Fxq "$guarded" "$CRASHDIR/configs/command.env" || stop 'Custom COMMAND requires review'
-if [ ! -f "$STATE/PANSOUL2-prepared" ]; then
+if [ ! -f "$STATE/rom-prepared" ]; then
     [ -z "$(pidof CrashCore 2>/dev/null)" ] || stop 'Stop the current core before first integration'
     touch "$CRASHDIR/.dis_startup" "$CRASHDIR/.start_error"
-    backup="$STATE/pansoul2-originals-$(date +%Y%m%d-%H%M%S)-$$"
+    backup="$STATE/rom-originals-$(date +%Y%m%d-%H%M%S)-$$"
     mkdir -m 700 "$backup" "$backup/starts" "$backup/configs"
     while read -r rel; do cp -p "$CRASHDIR/$rel" "$backup/$rel"; done < "$ASSETS/template-list.txt"
     cp -p "$CRASHDIR/configs/command.env" "$backup/configs/command.env"
@@ -66,7 +66,7 @@ cp "$ASSETS/templates/starts/shellcrash.procd" /etc/init.d/shellcrash
 chmod 755 /etc/init.d/shellcrash
 if [ -f "$CRASHDIR/.dis_startup" ] || [ -f "$CRASHDIR/.start_error" ]; then /etc/init.d/shellcrash disable; fi
 echo 0 > /proc/sys/vm/panic_on_oom
-touch "$STATE/PANSOUL2-prepared"
+touch "$STATE/rom-prepared"
 # Reclaim only the exact redundant public archive now supplied by verified ROM.
 if [ -f "$CRASHDIR/CrashCore.gz" ] && [ ! -L "$CRASHDIR/CrashCore.gz" ] && \
    [ "$(digest "$CRASHDIR/CrashCore.gz")" = 915cacd0cd51206ab467a5bd426a758d02272bb3adb7ab1d8ea372e541570778 ]; then

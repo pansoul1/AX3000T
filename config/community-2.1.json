@@ -1,6 +1,6 @@
 {
-  "name": "pansoul-2.1",
-  "branding": "pansoul 定制版本 2.1",
+  "name": "community-2.1",
+  "branding": "AX3000T 社区固件 2.1",
   "features": {
     "ssh": true,
     "sftp": true,
