@@ -1,6 +1,6 @@
 # AX3000T 社区固件
 
-基于 **小米 AX3000T RD03 官方 1.0.98** 的离线定制工具与社区版 2.1 成品。保留官方系统主体，按需加入 SSH、SFTP、原生后台 WOL 和带内存保护的 ShellCrash。网页版本文字也可自行修改，不内置个人品牌。
+基于 **小米 AX3000T RD03 官方 1.0.98** 的离线定制工具与社区版 2.1 成品。保留官方系统主体，按需加入 SSH、SFTP、原生后台 WOL 和带内存保护的 ShellCrash，支持自定义网页版本文字。
 
 **仅支持 RD03 和摘要锁定的官方 1.0.98。不支持 RD03v2、新版 AX3000T、RD23 或其他 ROM。** 这是社区项目，生成的包没有小米有效签名，也不是完整的 OpenWrt 源码工程。
 
@@ -85,8 +85,6 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\First-Flash.ps1" -Rou
 - [社区版 2.1 固件](firmware/community-2.1/RD03-1.0.98-community-2.1-custom-web.bin)
 - [SHA256SUMS](firmware/community-2.1/SHA256SUMS)
 - [成品说明与构建报告](firmware/community-2.1/README.md)
-
-这是去除个人品牌后**重新构建的社区版 2.1**，有独立摘要，不与过去的个人定制成品混用校验值，也不沿用旧包的真机报告。
 
 根目录主要文件夹保持三个：
 
